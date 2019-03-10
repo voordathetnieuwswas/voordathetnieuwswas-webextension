@@ -1,0 +1,29 @@
+iframe.vhnw-frame {
+    position: fixed;
+    width: 330px;
+    top: 0;
+    right: 0;
+    z-index: 2147483647;
+    height: 100%;
+    overflow: hidden;
+    border: 0;
+    display: none;
+}
+
+body img.vhnw-indicator-img {
+    height: 1em !important;
+    width: 1em !important;
+    margin-left: 0.3em !important;
+    animation-name: vhnw-indicator-appear !important;
+    animation-duration: 1s !important;
+    animation-timing-function: ease-out !important;
+}
+
+@keyframes vhnw-indicator-appear {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}

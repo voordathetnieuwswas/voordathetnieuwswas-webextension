@@ -1,0 +1,47 @@
+{
+  "name": "Voordat het nieuws was",
+  "short_name": "VHNW",
+  "description": "Deze extensie helpt om beleidsstukken te vinden die horen bij het nieuws dat je aan het bekijken bent.",
+  "author": "Oberon",
+  "homepage_url": "https://www.voordathetnieuwswas.nl",
+  "manifest_version": 2,
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "64": "images/icon-64.png",
+    "128": "images/icon-128.png"
+  },
+  "background": {
+    "scripts":["scripts/background.js"],
+    "persistent" : false
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon-disabled-16.png",
+      "32": "images/icon-disabled-32.png",
+      "64": "images/icon-disabled-64.png",
+      "128": "images/icon-disabled-128.png"
+    },
+    "default_title": "Voordat het nieuws was"
+  },
+  "web_accessible_resources": [
+    "styles/sidebar.css",
+    "images/back.svg",
+    "images/close.svg",
+    "images/close-small.svg",
+    "images/disabled.svg",
+    "images/icon.svg",
+    "images/logo.svg",
+    "images/plus-small.svg",
+    "images/sadface.svg",
+    "images/settings.svg",
+    "images/switch-off.svg",
+    "images/switch-on.svg"
+  ],
+  "__firefox__browser_specific_settings": {
+    "gecko": {
+      "id": "voordat-het-nieuws-was@oberon.nl"
+    }
+  },
+  "__edge__persistent" : "background"
+}

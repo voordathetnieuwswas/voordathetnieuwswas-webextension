@@ -1,0 +1,7 @@
+{
+  "extends": ["tslint-config-oberon"],
+  "linterOptions": { "exclude": "**/**.js" },
+  "rules": {
+    "space-in-parens": false
+  }
+}
