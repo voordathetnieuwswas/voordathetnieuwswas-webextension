@@ -1,6 +1,7 @@
-# chrome ext
+# Voordat het nieuws was
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Voordat het nieuws was zoekt stukken van de raad en staten bij het laatste nieuws. 
+Zie https://www.voordathetnieuwswas.nl/
 
 ## Install
 
