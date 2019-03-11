@@ -23,7 +23,7 @@ export const handleArticleLinks = (siteHandler: SiteHandler, cache: OpenStateCac
                         if (keywords && keywords.length) {
                             // search keywords on openstate api
                             // TODO: remove daysAgo before release
-                            //findCount(keywords, 50)
+                            // findCount(keywords, 50)
                             findCount(keywords)
                                 .then((count: number) => {
                                     siteHandler.updateElement(count, item.element);
