@@ -138,7 +138,7 @@ export const getKeywordsFromBodyAndTitle = (
             // double word value for title
             const text: string = (articleTitle.textContent + ' ' || '').repeat(2) + extractTextFromNodes(articleBodyNodes);
             const tokens: TokenWords = textToTokens(text);
-            //console.log(tokens);
+            // console.log(tokens);
 
             // we will only match keywords if any of the weed cutter words have been found. This will limit the number of matches greatly
             if (matchesKeywords(tokens, weedCutterWords)) {
