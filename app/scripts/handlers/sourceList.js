@@ -10,7 +10,6 @@ module.exports = {
     'www.ad.nl': 'ad',
     'www.destentor.nl': 'ds',
     'www.rtvutrecht.nl': 'rtvu',
-    'www.rtvutrecht.nl': 'rtvu',
     'www.limburger.nl': 'lim',
     'www.1limburg.nl': '1lim',
     'www.omroepflevoland.nl': 'ofl',
