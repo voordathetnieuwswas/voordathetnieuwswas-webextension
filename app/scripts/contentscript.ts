@@ -38,9 +38,7 @@ export const init = async () => {
         // cache.clear();
 
         // we found a handler, but will it actually handle?
-        console.log('shouldHandle', siteHandler.shouldHandle(location))
         if (siteHandler.shouldHandle(location)) {
-            console.log('isArticlePage', siteHandler.isArticlePage())
             if (siteHandler.isArticlePage()) {
                 // get the open state results for the current main article
                 results = await handleCurrentArticle(siteHandler, cache);
