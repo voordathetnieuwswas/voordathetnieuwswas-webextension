@@ -5,7 +5,7 @@ export interface SiteHandler {
     getKeywords: GetKeywords;
     updateElement: UpdateElement;
     isArticlePage: IsArticlePage;
-    shouldHandle: (location: HTMLHyperlinkElementUtils|Location) => boolean;
+    shouldHandle: (location: HTMLHyperlinkElementUtils | Location) => boolean;
 }
 
 export interface ArticleLink {
@@ -30,7 +30,7 @@ export type IsArticlePage = () => boolean;
 export type GetKeywordsMethod = (text: string, tokens: TokenWords) => Keywords;
 export type GetCityMethod = (selector: string, dom: DocumentFragment) => string;
 export type UrlElementValidator = (link: ArticleLink) => boolean;
-export type BodyElementCleaner = (nodes:NodeListOf<Element>) => Element[];
+export type BodyElementCleaner = (nodes: NodeListOf<Element>) => Element[];
 
 export interface CacheItem {
     count: number | null;

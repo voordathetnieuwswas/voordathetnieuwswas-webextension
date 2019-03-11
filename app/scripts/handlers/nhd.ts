@@ -18,7 +18,6 @@ const linkSelector = `a.common-components-articleteasers_articleteaserlarge--lin
                 a.common-components-articleteasers_articleteasersmallwide--link,
                 a.common-components-articleteasers_articleteasermini--link`;
 
-
 export const handler: SiteHandler = {
     shouldHandle: (location) => !location.pathname.startsWith('/sport'),
     getUrls: getUrlsBySelector(linkSelector, (link: ArticleLink) => {
@@ -37,5 +36,5 @@ export const handler: SiteHandler = {
     updateElement: updateElementByTitlePrefix(
         '.common-components-articleteasers_articletitletext--text'
     ),
-    isArticlePage: containsSelector('.common-components-article_index--articlebody'),
+    isArticlePage: containsSelector('.common-components-article_index--articlebody, .article-detail__article-main'),
 };
