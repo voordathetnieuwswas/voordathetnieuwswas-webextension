@@ -3,8 +3,10 @@ import { DocumentResult } from '../scripts/lib/openstate';
 export interface SiteHandler {
     getUrls: GetUrlsFunction;
     getKeywords: GetKeywords;
+    mutatablesSelector: string;
     updateElement: UpdateElement;
     isArticlePage: IsArticlePage;
+    isSPA: IsSinglePageApplication;
     shouldHandle: (location: HTMLHyperlinkElementUtils | Location) => boolean;
 }
 
@@ -27,6 +29,7 @@ export type GetUrlsFunction = () => ArticleLink[];
 export type GetKeywords = (dom: DocumentFragment) => Keywords;
 export type UpdateElement = (count: number, element: Element) => void;
 export type IsArticlePage = () => boolean;
+export type IsSinglePageApplication = () => boolean;
 export type GetKeywordsMethod = (text: string, tokens: TokenWords) => Keywords;
 export type GetCityMethod = (selector: string, dom: DocumentFragment) => string;
 export type UrlElementValidator = (link: ArticleLink) => boolean;
@@ -63,5 +66,3 @@ export interface HitCounts {
     province: number;
     municipality: number;
 }
-
-

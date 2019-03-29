@@ -243,6 +243,11 @@ export const updateElementByTitlePrefix = (childSelector?: string): UpdateElemen
 export const defaultUrlElementValidator = (link: ArticleLink) => true;
 
 /**
+ * default to not a single page application
+ */
+export const defaultSPAChecker = () => false;
+
+/**
  * Concat all nodes to one text string
  * @param nodes
  */

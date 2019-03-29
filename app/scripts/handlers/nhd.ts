@@ -1,6 +1,6 @@
 import { ArticleLink, SiteHandler } from '../../entities/handlers';
 import {
-    containsSelector,
+    containsSelector, defaultSPAChecker,
     getKeywordsByMetaAndBody,
     getUrlsBySelector,
     updateElementByTitlePrefix
@@ -37,4 +37,6 @@ export const handler: SiteHandler = {
         '.common-components-articleteasers_articletitletext--text'
     ),
     isArticlePage: containsSelector('.common-components-article_index--articlebody, .article-detail__article-main'),
+    isSPA: defaultSPAChecker,
+    mutatablesSelector: '',
 };

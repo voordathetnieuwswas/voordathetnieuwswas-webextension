@@ -434,7 +434,6 @@ export const words: WordList = [
     'bouwhoogte',
     'bouwkundige',
     'bouwplan',
-    'bouwplannen',
     'bouwpuin',
     'bouwstenen',
     'bouwverordening',
@@ -458,6 +457,7 @@ export const words: WordList = [
     'budgettaire',
     'buitenruimte',
     'bundel',
+    'burgemeester',
     'burgemeesters',
     'burgerinitiatief',
     'burgerpanel',
@@ -553,7 +553,6 @@ export const words: WordList = [
     'correctie',
     'correspondentie',
     'creatieve',
-    'criminaliteit',
     'crimineel',
     'criminele',
     'criminelen',
@@ -924,7 +923,6 @@ export const words: WordList = [
     'grondslagen',
     'grondwater',
     'grondwaterpeil',
-    'grondzaken',
     'grootschalig',
     'grootschalige',
     'grootte',
@@ -972,6 +970,7 @@ export const words: WordList = [
     'hinder',
     'historie',
     'historisch',
+    'historische',
     'hof',
     'hogeschool',
     'hoofd',
@@ -981,7 +980,6 @@ export const words: WordList = [
     'hoofdstukken',
     'hoofdweg',
     'hoofdwegen',
-    'hoofdzaak',
     'hoofdzakelijk',
     'hoogheemraadschap',
     'hoogste',
@@ -1187,7 +1185,6 @@ export const words: WordList = [
     'kijk',
     'kind',
     'kinderen',
-    'kinderopvang',
     'klacht',
     'klachten',
     'klankbordgroep',
@@ -1238,7 +1235,6 @@ export const words: WordList = [
     'kwetsbaar',
     'kwetsbare',
     'kwijtschelding',
-    'laan',
     'lammeren',
     'landbouw',
     'landbouwgrond',
@@ -1384,7 +1380,6 @@ export const words: WordList = [
     'mix',
     'mobiele',
     'mobiliteit',
-    'mobiliteitsplannen',
     'modelverordening',
     'moderne',
     'moeite',
@@ -1539,8 +1534,6 @@ export const words: WordList = [
     'oordeelsvormend',
     'oorspronkelijk',
     'oorspronkelijke',
-    'oorzaak',
-    'oorzaken',
     'opbouw',
     'opbrengst',
     'opbrengsten',
@@ -1605,9 +1598,6 @@ export const words: WordList = [
     'optimalisatie',
     'optimaliseren',
     'optreden',
-    'opvang',
-    'opvangen',
-    'opvanghuis',
     'opvolging',
     'opzetten',
     'opzicht',
@@ -2391,8 +2381,6 @@ export const words: WordList = [
     'vermindering',
     'vernieuwde',
     'vernieuwen',
-    'veroorzaakt',
-    'veroorzaken',
     'verordening',
     'verplaatsen',
     'verplaatsing',
@@ -2474,7 +2462,6 @@ export const words: WordList = [
     'vlak',
     'vliegveld',
     'vluchtelingen',
-    'vluchtelingenopvang',
     'vo',
     'voedsel',
     'voertuig',
@@ -2613,7 +2600,6 @@ export const words: WordList = [
     'werknemers',
     'werksessie',
     'werkvoorziening',
-    'werkzaak',
     'werkzaamheden',
     'wetboek',
     'wetenschap',
@@ -2651,11 +2637,9 @@ export const words: WordList = [
     'wro',
     'wsw',
     'wwb',
-    'zaak',
     'zaal',
     'zake',
     'zakelijke',
-    'zaken',
     'zand',
     'zee',
     'zeehaven',
@@ -2698,11 +2682,12 @@ export const dynamicWords: DynamicWordList = [
     /winkel|monument|onderwijs|educatie|vrijwilliger|cultuur|consument|milieu|kwaliteit|energie|vereniging|risico|nieuwbouw|evenementen/, // contains
     /project|jeugd|registratie|verkeer|voorstelling|tentoonstelling|ordening|scheepvaart|bestemming|vergunning|dieren|bedrijf|fabriek/, // contains
     /verontreiniging|sanering|patient|belasting|asbest|afval|installatie|drugs|cocaine|xtc|cannabis|pensioen|tarieven|huur|arbeid|visser/, // contains
-    /studenten|exploitatie|migratie|onderzoek(?!t)|camera|woning|logistiek|activiteit/, // contains
+    /studenten|exploitatie|migratie|onderzoek(?!t)|camera|woning|logistiek|activiteit|verlichting|opvang|criminaliteit/, // contains
     /^(?:bio|stof|spits|parkeer|marine|kaart|commissie|taxi|bestuur|terreur|maximum|gedoog)/, // starts with
     /(?:overlast|festival|plan|tijden|vriendelijk|raad|gemaal|bestuur|stof|telers?|gebied(?:en)?|centrum|centra|centrale|haltes?|tekort(?:en)?)$/, // ends with
-    /(?:norm(?:en)?|voorziening(?:en)?|tarief|regels?|regelling(?:en)?|apparatuur|verlichting|stromen|register|commissies?|geschiedenis|dienst(?:en)?)$/, // ends with
-    /(?:opslag|bedrijven|welzijn|stallen|wet|sector(?:en)?|eigenaars?|eigenaren|woning(?:en)?|politiek|griffier?|gebouw(?:en)?|relaties?|terreur)$/, // ends with
-    /(?:grens|plafond|maximum|prijzen|prijs|verbinding(?:en)?|meters?|feest(?:en)?|vergadering(?:en)?|dossiers?|debat(ten)?|organisaties?)$/, // ends with
+    /(?:norm(?:en)?|voorziening(?:en)?|tarief|regels?|regelling(?:en)?|apparatuur|stromen|register|commissies?|geschiedenis|dienst(?:en)?)$/, // ends with
+    /(?:opslag|bedrijven|welzijn|stallen|wet|sector(?:en)?|eigenaars?|eigenaren|woning(?:en)?|politiek|griffier?|gebouw(?:en)?|relaties?|terreur|storing(?:en)?)$/, // ends with
+    /(?:grens|plafond|maximum|prijzen|prijs|verbinding(?:en)?|meters?|feest(?:en)?|vergadering(?:en)?|dossiers?|debat(ten)?|organisaties?|plan(?:nen)?)$/, // ends with
+    /(?:zaak|zaken|salon|winkel)$/, // ends with
     /^[an]\d{1,3}$/, // autowegen
 ];

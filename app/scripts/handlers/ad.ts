@@ -1,6 +1,6 @@
 import { SiteHandler } from '../../entities/handlers';
 import {
-    containsSelector,
+    containsSelector, defaultSPAChecker,
     getKeywordsFromBodyAndTitle,
     getUrlsBySelector,
     updateElementByTitlePrefix
@@ -26,4 +26,6 @@ export const handler: SiteHandler = {
         '.ankeiler__title'
     ),
     isArticlePage: containsSelector('.article__wrapper'),
+    isSPA: defaultSPAChecker,
+    mutatablesSelector: '',
 };

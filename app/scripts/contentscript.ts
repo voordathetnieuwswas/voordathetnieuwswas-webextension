@@ -3,9 +3,9 @@ import { SiteHandler } from '../entities/handlers';
 import { handleArticleLinks } from './lib/content';
 import { handleCurrentArticle } from './lib/content';
 import OpenStateCache from './lib/cache';
-import { getOptions } from './lib/options';
+import { getOptions, Options} from './lib/options';
 import { buildSidebar, updateSidebarResults } from '../views/sidebar';
-import { findOrganizationsBasic } from './lib/openstate';
+import { BasicOrganizations, findOrganizationsBasic } from './lib/openstate';
 
 // initialize cache
 const cache = new OpenStateCache();
@@ -15,16 +15,50 @@ const siteHandler: SiteHandler | null = getSiteHandler(location.hostname);
 // @ts-ignore Typing incorrectly specifies string parameter
 const comPort = browser.runtime.connect({ name: 'vhnw-port' });
 
+let currentUrl: string = '';
+let organizations: BasicOrganizations;
+let options: Options;
+
+// observer to listen to changing nodes
+const mutationObserver: MutationObserver = new MutationObserver((mutationsList: any, observer: MutationObserver) => {
+    // node flattener callback
+    const flattenNodes = (acc: Node[], node: Node) => {
+        acc.push(node);
+        // flatten child nodes recursively
+        if (node.childNodes.length) {
+            Array.from(node.childNodes).reduce(flattenNodes, acc);
+        }
+        return acc;
+    };
+
+    for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            const list: Node[] = Array.from(mutation.addedNodes);
+            const flattened: Node[] = list.reduce(flattenNodes, []);
+            if (flattened.some((el: Node) => el.nodeName === 'A')) {
+                setup();
+                break;
+            }
+        }
+    }
+});
+
 /**
  * Run on page load
  */
 export const init = async () => {
     // Get and setup extension options
-    const [organizations, options] = await Promise.all([
+    [organizations, options] = await Promise.all([
         findOrganizationsBasic(),
         getOptions(),
         cache.init()
     ]);
+
+    await setup();
+};
+
+const setup = async () => {
+    currentUrl = location.href;
 
     let results = null;
     let autoOpen = false;
@@ -37,7 +71,14 @@ export const init = async () => {
         // TODO: remove before release
         // cache.clear();
 
-        // we found a handler, but will it actually handle?
+        // remove vhnw markers
+        if (alreadyLoaded) {
+            document.querySelectorAll('.vhnw-indicator-img').forEach(element => {
+                element.remove();
+            });
+        }
+
+        // we found a handler, but should it actually handle?
         if (siteHandler.shouldHandle(location)) {
             if (siteHandler.isArticlePage()) {
                 // get the open state results for the current main article
@@ -51,9 +92,6 @@ export const init = async () => {
             }
 
             if (alreadyLoaded) {
-                document.querySelectorAll('.vhnw-indicator-img').forEach(element => {
-                    element.remove();
-                });
                 updateSidebarResults(results, options, organizations);
             }
 
@@ -76,6 +114,20 @@ export const init = async () => {
     }
 };
 
+// setup listeners for lazy loaded elements
+const setupContentMutationListeners = () => {
+    // removed old observes nodes
+    mutationObserver.disconnect();
+
+    if (siteHandler && siteHandler.mutatablesSelector.length) {
+        // Select the node that will be observed for mutations
+        const updatingNodes: NodeListOf<Element> = document.querySelectorAll(siteHandler.mutatablesSelector);
+        updatingNodes.forEach((node: Node) => {
+            mutationObserver.observe(node, { attributes: false, childList: true, subtree: true });
+        });
+    }
+};
+
 // Run init then bind sidebar toggle to addon icon
 init().then(() => {
     // @ts-ignore Typing incorrectly specifies no parameters
@@ -88,4 +140,15 @@ init().then(() => {
             }
         }
     });
+
+    if (siteHandler && siteHandler.isSPA()) {
+        setInterval(() => {
+            if (location.href !== currentUrl) {
+                // the url is updated, reset everything. The timeout is a bit nasty, but we can setup the mutation listeners before the elements are there
+                setup().then(() => setTimeout(setupContentMutationListeners, 200));
+            }
+        }, 50);
+    }
+
+    setupContentMutationListeners();
 });

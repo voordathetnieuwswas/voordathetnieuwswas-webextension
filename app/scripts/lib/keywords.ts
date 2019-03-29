@@ -115,6 +115,7 @@ export const normalize = (word: string) => removeDiacritics(word.trim().toLowerC
  */
 const cleanWords = (keywords: Keywords): Keywords => {
     keywords = removeCommonWords(keywords);
+    keywords = applyBlocklist(keywords);
     keywords = removeNumbers(keywords);
     return keywords;
 };
@@ -126,11 +127,23 @@ const cleanWords = (keywords: Keywords): Keywords => {
 const removeCommonWords = (keywords: Keywords): Keywords => {
     const common = [
         '', 'de', 'het', 'een', 'dit', 'dat', 'die', 'dus', 'er', 'op', 'in', 'aan', 'met', 'van', 'ter', 'is', 'tot', 'om', 'rond', 'hen', 'hun', 'haar', 'zijn', 'mijn', 'jullie', 'ze', 'we',
-        'al', 'veel', 'moet', 'wordt', 'worden', 'zijn', 'door', 'waar', 'en', 'bij'
+        'al', 'veel', 'moet', 'wordt', 'worden', 'zijn', 'door', 'waar', 'en', 'bij',
     ];
 
     return keywords.filter((keyword) => {
         return common.indexOf(keyword.toLowerCase()) === -1;
+    });
+};
+
+/**
+ * Remove words that will match but shouldn't. F.E. words that match because they have the same suffix as a street name
+ * @param keywords
+ */
+const applyBlocklist = (keywords: Keywords): Keywords => {
+    const blocklist = ['simpelweg', 'gewoonweg', 'overslaan'];
+
+    return keywords.filter((keyword) => {
+        return blocklist.indexOf(keyword.toLowerCase()) === -1;
     });
 };
 

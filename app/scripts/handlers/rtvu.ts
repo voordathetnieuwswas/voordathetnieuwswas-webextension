@@ -1,6 +1,6 @@
 import { SiteHandler } from '../../entities/handlers';
 import {
-    containsSelector, getCityByFirstUpperCaseWord,
+    containsSelector, defaultSPAChecker, getCityByFirstUpperCaseWord,
     getKeywordsByMetaAndBody,
     getUrlsBySelector,
     updateElementByTitlePrefix
@@ -49,4 +49,6 @@ export const handler: SiteHandler = {
         '.newsitem-title, .block-title a'
     ),
     isArticlePage: containsSelector('.article-content'),
+    isSPA: defaultSPAChecker,
+    mutatablesSelector: '',
 };

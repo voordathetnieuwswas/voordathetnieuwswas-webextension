@@ -4,7 +4,7 @@ module.exports = {
     'www.haarlemsdagblad.nl': 'nhd',
     'www.ijmuidercourant.nl': 'nhd',
     'www.gooieneemlander.nl': 'nhd',
-    // 'www.nhnieuws.nl' : 'nhn',
+    'www.nhnieuws.nl' : 'nhn',
     'nos.nl': 'nos',
     'www.omroepwest.nl': 'ow',
     'www.ad.nl': 'ad',
@@ -14,4 +14,5 @@ module.exports = {
     'www.1limburg.nl': '1lim',
     'www.omroepflevoland.nl': 'ofl',
     'www.parool.nl': 'par',
+    'www.at5.nl': 'at5',
 };
