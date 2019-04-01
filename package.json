@@ -1,6 +1,6 @@
 {
     "name": "voordat-het-nieuws-was",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Deze extensie helpt om beleidsstukken te vinden die horen bij het nieuws dat je aan het bekijken bent.",
     "scripts": {
         "dev": "webextension-toolbox dev",

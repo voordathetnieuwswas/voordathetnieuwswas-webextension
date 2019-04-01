@@ -69,7 +69,7 @@ const setup = async () => {
 
     if (siteHandler) {
         // TODO: remove before release
-        // cache.clear();
+        cache.clear();
 
         // remove vhnw markers
         if (alreadyLoaded) {
@@ -145,7 +145,9 @@ init().then(() => {
         setInterval(() => {
             if (location.href !== currentUrl) {
                 // the url is updated, reset everything. The timeout is a bit nasty, but we can setup the mutation listeners before the elements are there
-                setup().then(() => setTimeout(setupContentMutationListeners, 200));
+                setTimeout(() => {
+                    setup().then(() => setupContentMutationListeners());
+                }, 200);
             }
         }, 50);
     }
