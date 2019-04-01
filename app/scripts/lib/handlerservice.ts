@@ -222,16 +222,20 @@ export const containsSelector = (selector: string): IsArticlePage => {
 export const updateElementByTitlePrefix = (childSelector?: string): UpdateElement => {
     return (count, element) => {
         if (count > 0) {
+            const className = 'vhnw-indicator-img';
             const childElement = childSelector && element.querySelector(childSelector);
             const elementToUpdate = childElement || element;
 
-            const indicator = document.createElement('img') as HTMLImageElement;
-            indicator.src = browser.extension.getURL('images/icon.svg');
-            indicator.className = 'vhnw-indicator-img';
-            indicator.title = '[Voordat het nieuws was] Resultaten gevonden voor dit artikel';
-            indicator.alt = 'Voordat het nieuws was indicator';
+            // check if the element does not have a marker yet
+            if (!elementToUpdate.querySelector(`img.${className}`)) {
+                const indicator = document.createElement('img') as HTMLImageElement;
+                indicator.src = browser.extension.getURL('images/icon.svg');
+                indicator.className = className;
+                indicator.title = '[Voordat het nieuws was] Resultaten gevonden voor dit artikel';
+                indicator.alt = 'Voordat het nieuws was indicator';
 
-            elementToUpdate.appendChild(indicator);
+                elementToUpdate.appendChild(indicator);
+            }
         }
     };
 };

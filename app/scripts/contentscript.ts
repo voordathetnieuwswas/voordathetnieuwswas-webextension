@@ -58,8 +58,6 @@ export const init = async () => {
 };
 
 const setup = async () => {
-    currentUrl = location.href;
-
     let results = null;
     let autoOpen = false;
 
@@ -69,7 +67,7 @@ const setup = async () => {
 
     if (siteHandler) {
         // TODO: remove before release
-        cache.clear();
+        // cache.clear();
 
         // remove vhnw markers
         if (alreadyLoaded) {
@@ -144,12 +142,22 @@ init().then(() => {
     if (siteHandler && siteHandler.isSPA()) {
         setInterval(() => {
             if (location.href !== currentUrl) {
+                currentUrl = location.href;
+
                 // the url is updated, reset everything. The timeout is a bit nasty, but we can setup the mutation listeners before the elements are there
-                setTimeout(() => {
-                    setup().then(() => setupContentMutationListeners());
-                }, 200);
+                const iframe = document.querySelector('iframe.vhnw-frame');
+                if (iframe) {
+                    iframe.remove();
+                }
+                comPort.postMessage({ hasResults: false });
+
+                setTimeout(() => setup().then(setupContentMutationListeners), 500);
             }
         }, 50);
+    }
+
+    document.onreadystatechange = function () {
+        console.log(document.readyState);
     }
 
     setupContentMutationListeners();
