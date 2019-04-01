@@ -20,6 +20,16 @@ browser.runtime.onConnect.addListener(port => {
                     128: 'images/icon-128.png'
                 }
             });
+        } else {
+            browser.browserAction.setIcon({
+                tabId,
+                path: {
+                    16: 'images/icon-disabled-16.png',
+                    32: 'images/icon-disabled-32.png',
+                    64: 'images/icon-disabled-64.png',
+                    128: 'images/icon-disabled-128.png'
+                }
+            });
         }
     });
 

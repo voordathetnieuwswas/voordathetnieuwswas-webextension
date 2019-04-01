@@ -145,7 +145,12 @@ init().then(() => {
         setInterval(() => {
             if (location.href !== currentUrl) {
                 // the url is updated, reset everything. The timeout is a bit nasty, but we can setup the mutation listeners before the elements are there
-                setup().then(() => setTimeout(setupContentMutationListeners, 200));
+                const iframe = document.querySelector('iframe.vhnw-frame');
+                if (iframe) {
+                    iframe.remove();
+                }
+                comPort.postMessage({ hasResults: false });
+                setTimeout(() => setup().then(setupContentMutationListeners), 200);
             }
         }, 50);
     }
