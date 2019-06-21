@@ -7,14 +7,7 @@ export interface Options {
     filterOrganizations: boolean;
 }
 
-export interface OptionsParam {
-    enabledProvinces?: string[];
-    enabledMunicipalities?: string[];
-    showOverviewIcons?: boolean;
-    autoOpenPanel?: boolean;
-    hideWelcomePanel?: boolean;
-    filterOrganizations?: boolean;
-}
+export type OptionsParam = Partial<Options>;
 
 const defaultOptions: Options = {
     enabledProvinces: [],

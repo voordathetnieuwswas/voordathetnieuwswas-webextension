@@ -2,13 +2,11 @@ import { getSiteHandler } from './handlers';
 import { SiteHandler } from '../entities/handlers';
 import { handleArticleLinks } from './lib/content';
 import { handleCurrentArticle } from './lib/content';
-import OpenStateCache from './lib/cache';
-import { getOptions, Options} from './lib/options';
+import OpenStateCache, { getDefaultCache } from './lib/cache';
+import { getOptions, Options } from './lib/options';
 import { buildSidebar, updateSidebarResults } from '../views/sidebar';
 import { BasicOrganizations, findOrganizationsBasic } from './lib/openstate';
 
-// initialize cache
-const cache = new OpenStateCache();
 // get the handler for this site if we support it
 const siteHandler: SiteHandler | null = getSiteHandler(location.hostname);
 
@@ -18,6 +16,7 @@ const comPort = browser.runtime.connect({ name: 'vhnw-port' });
 let currentUrl: string = '';
 let organizations: BasicOrganizations;
 let options: Options;
+let cache: OpenStateCache;
 
 // observer to listen to changing nodes
 const mutationObserver: MutationObserver = new MutationObserver((mutationsList: any, observer: MutationObserver) => {
@@ -48,10 +47,10 @@ const mutationObserver: MutationObserver = new MutationObserver((mutationsList: 
  */
 export const init = async () => {
     // Get and setup extension options
-    [organizations, options] = await Promise.all([
+    [organizations, options, cache] = await Promise.all([
         findOrganizationsBasic(),
         getOptions(),
-        cache.init()
+        getDefaultCache()
     ]);
 
     await setup();
@@ -66,9 +65,6 @@ const setup = async () => {
     const alreadyLoaded = !!existingFrame;
 
     if (siteHandler) {
-        // TODO: remove before release
-        // cache.clear();
-
         // remove vhnw markers
         if (alreadyLoaded) {
             document.querySelectorAll('.vhnw-indicator-img').forEach(element => {
@@ -154,10 +150,6 @@ init().then(() => {
                 setTimeout(() => setup().then(setupContentMutationListeners), 500);
             }
         }, 50);
-    }
-
-    document.onreadystatechange = function () {
-        console.log(document.readyState);
     }
 
     setupContentMutationListeners();

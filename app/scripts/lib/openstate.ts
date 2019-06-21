@@ -1,23 +1,33 @@
-import { getOptions, Options } from './options';
-import { OpenStateEvent } from '../../entities/handlers';
+import { getOptions } from './options';
+import { getDefaultCache } from './cache';
 
-const BASE_URL = 'https://api.openraadsinformatie.nl/v0/search';
-const MAX_RESULT_SIZE = 500;
+const BASE_URL_SEARCH = 'https://api.openraadsinformatie.nl/v1/elastic';
+// const BASE_URL_LOOKUP = 'https://id.openraadsinformatie.nl';
+const MAX_RESULT_SIZE = 10000;
 const DATE_INTERVAL_DAYS = 14;
 
-interface ResultMeta {
-    took: number;
-    total: number;
+export interface Document {
+    _id: string;
+    _index: string;
+    _source: object;
+    highlight?: object;
+}
+
+export interface SearchResponse {
+    hits: {
+        hits: Document[];
+        total: {
+            value: number;
+        };
+    };
+    timed_out: boolean;
 }
 
 export interface Organization {
     id: string;
     name: string;
     classification: string;
-    description: string;
-    meta: {
-        collection: string;
-    };
+    collection: string;
 }
 
 export interface BasicOrganizations {
@@ -25,178 +35,148 @@ export interface BasicOrganizations {
     municipalities: { [id: string]: string };
 }
 
-interface SearchResponse {
-    meta: ResultMeta;
-    organizations?: Organization[];
-    events?: OpenStateEvent[];
-}
-
-interface DateFilter {
-    from: string; // Format: Y-m-d
-    to: string; // Format: Y-m-d
-}
-
-interface TermsFilter {
-    terms: string[];
-}
-
-interface SearchParameters {
-    query?: string;
-    filters?: {
-        processing_started?: DateFilter;
-        processing_finished?: DateFilter;
-        source?: TermsFilter;
-        collection?: TermsFilter;
-        rights?: TermsFilter;
-        index?: TermsFilter;
-        types?: TermsFilter;
-        start_date?: DateFilter;
-        organization_id?: TermsFilter;
-        classification?: TermsFilter;
+export interface MediaObject {
+    id: string;
+    index: string;
+    name: string;
+    content_type: string;
+    url: string;
+    size_in_bytes: number;
+    highlight: {
+        name?: string[];
+        text?: string[];
     };
-    facets?: any; // Not specified since we don't use this at the moment
-    sort?: string;
-    order?: string;
-    size?: number;
-    from?: number;
+    date_modified?: string;
 }
 
-export interface DocumentResult {
-    source: {
-        note: string;
-        url: string;
-    };
-    event: {
-        name: string;
-        collection: string;
-        classification: string;
-        startDate?: string;
-    };
-    highlights: string[];
-}
-
-export const findCount = async (keywords: string[], daysAgo: number = DATE_INTERVAL_DAYS): Promise<number> => {
-    const options = await getOptions();
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - daysAgo);
-
-    const params: SearchParameters = {
-        filters: {
-            types: {
-                terms: [
-                    'events'
-                ]
+const mediaObjectsQuery = async (keywords: string[]) => ({
+    bool: {
+        must: [
+            {
+                match: {
+                    '@type': 'MediaObject'
+                }
             },
-            collection: {
-                terms: await collectionTerms(options)
+            {
+                simple_query_string: {
+                    fields: ['text', 'name'],
+                    default_operator: 'and',
+                    query: keywords.join(' ')
+                }
             },
-            start_date: {
-                from: fromDate.toISOString().substr(0, 10),
-                to: (new Date()).toISOString().substr(0, 10)
+            {
+                exists: {
+                    field: 'url'
+                }
+            },
+            {
+                terms: {
+                    isReferencedBy: await getRelatedItems()
+                }
             }
-        },
-        size: 0,
-        query: keywords.map(keyword => `"${keyword}"`).join(' ')
-    };
+        ]
+    }
+});
 
-    const result = await sendSearchRequest(params);
+let relatedItems: Promise<string[]>;
 
-    return result.meta.total;
+const getRelatedItems = () => {
+    if (relatedItems === undefined) {
+        relatedItems = findRelatedItems();
+    }
+
+    return relatedItems;
 };
 
-export const findResults = async (keywords: string[], offset: number = 0, daysAgo: number = DATE_INTERVAL_DAYS): Promise<SearchResponse> => {
-    const options = await getOptions();
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - daysAgo);
+const findRelatedItems = async () => {
+    const cache = await getDefaultCache();
+    const cachedItems = cache.get('referencedItemIds');
+    if (cachedItems) {
+        return cachedItems.keywords;
+    }
 
-    const params: SearchParameters = {
-        filters: {
-            types: {
-                terms: [
-                    'events'
+    const query = {
+        query: {
+            bool: {
+                must: [
+                    {
+                        range: {
+                            start_date: {
+                                gte: `now-${DATE_INTERVAL_DAYS}d/d`
+                            }
+                        }
+                    },
+                    {
+                        exists: {
+                            field: 'attachment'
+                        }
+                    }
                 ]
-            },
-            collection: {
-                terms: await collectionTerms(options)
-            },
-            start_date: {
-                from: fromDate.toISOString().substr(0, 10),
-                to: (new Date()).toISOString().substr(0, 10)
+            }
+        },
+        size: MAX_RESULT_SIZE,
+        _source: false
+    };
+
+    const result = await sendSearchRequest(query);
+    const ids = result.hits.hits.map(hit => hit._id);
+    const cacheItem = cache.create();
+    cacheItem.keywords = ids;
+    cache.set('referencedItemIds', cacheItem);
+
+    return ids;
+};
+
+export const findCount = async (keywords: string[]): Promise<number> => {
+    const query = {
+        query: await mediaObjectsQuery(keywords),
+        size: 0,
+    };
+
+    const result = await sendSearchRequest(query);
+
+    return result.hits.total.value;
+};
+
+export const findResults = async (keywords: string[]): Promise<MediaObject[]> => {
+    const response = await sendSearchRequest({
+        query: await mediaObjectsQuery(keywords),
+        highlight: {
+            fields: {
+                name: {},
+                text: {}
             }
         },
         size: 10,
-        from: offset,
-        query: keywords.map(keyword => `"${keyword}"`).join(' ')
-    };
+        _source: [
+            'content_type',
+            'date_modified',
+            'id',
+            'name',
+            'size_in_bytes',
+            'url',
+            'isReferencedBy'
+        ]
+    });
 
-    return sendSearchRequest(params);
+    return response.hits.hits.map((hit: Document) => ({
+        id: hit._id,
+        index: hit._index,
+        highlight: hit.highlight,
+        ...hit._source
+    } as MediaObject));
 };
 
-const collectionTerms = async (options: Options): Promise<string[]> => {
+const getEnabledIndices = async (): Promise<string> => {
+    const options = await getOptions();
+
     if (options.filterOrganizations) {
-        return options.enabledProvinces.concat(options.enabledMunicipalities);
-    } else {
-        const organizations = await findOrganizationsBasic();
-        return Object.keys(organizations.provinces);
-    }
-};
-
-/**
- * Attempts to find 10 DocumentResults for the given keywords.
- * Will run repeated API requests in case not enough valid documents can be extracted from the initial result set.
- */
-export const findDocumentResults = async (keywords: string[], daysAgo: number = DATE_INTERVAL_DAYS): Promise<DocumentResult[]> => {
-    const results: DocumentResult[] = [];
-    const sourceUrls: string[] = [];
-    let i = 0;
-    let totalResults = 1000;
-
-    while (results.length < 10 && totalResults > (i + 1) * 10) {
-        const searchResult = await findResults(keywords, i * 10, daysAgo);
-        const events = searchResult.events;
-        totalResults = searchResult.meta.total;
-
-        events && events.map((event: OpenStateEvent) => {
-            if (event.meta.highlight && event.meta.highlight['sources.description']) {
-                // Remove duplicates
-                const highlights = Array.from(new Set(event.meta.highlight['sources.description']));
-
-                event.sources.map(source => {
-                    if (!source.description || sourceUrls.includes(source.url)) {
-                        return;
-                    }
-
-                    const matchedHighlights = highlights.filter(highlight => {
-                        const cleanHighlight = highlight.replace(/<\/?em>/g, '');
-                        return source.description.includes(cleanHighlight);
-                    });
-
-                    if (!matchedHighlights || !matchedHighlights.length) {
-                        return;
-                    }
-
-                    results.push({
-                        source: {
-                            note: source.note,
-                            url: source.url
-                        },
-                        event: {
-                            name: event.name,
-                            collection: event.meta.collection,
-                            classification: event.classification,
-                            startDate: event.start_date
-                        },
-                        highlights: matchedHighlights
-                    });
-                    sourceUrls.push(source.url);
-                });
-            }
-        });
-
-        i++;
+        return options.enabledProvinces.map(province => `osi_${province}_*`)
+            .concat(options.enabledMunicipalities.map(municipality => `ori_${municipality}_*`))
+            .join(',');
     }
 
-    return results.slice(0, 10);
+    return 'osi_*';
 };
 
 export const findOrganizations = async (types: string | string[]): Promise<Organization[]> => {
@@ -204,18 +184,32 @@ export const findOrganizations = async (types: string | string[]): Promise<Organ
         types = [types];
     }
 
-    const result = await sendSearchRequest({
-        filters: {
-            classification: {
-                terms: types
-            }
+    const response = await sendSearchRequest(
+        {
+            size: MAX_RESULT_SIZE,
+            query: {
+                bool: {
+                    should: types.map(type => ({
+                        match: {
+                            classification: type
+                        }
+                    }))
+                }
+            },
+            _source: [
+                'name',
+                'classification',
+                'collection'
+            ]
         },
-        size: MAX_RESULT_SIZE,
-        sort: 'meta.source_id',
-        order: 'asc'
-    }, '/organizations');
+        true
+    );
 
-    return result.organizations || [];
+    return response.hits.hits.map((hit: Document) => ({
+        id: hit._id,
+        index: hit._index,
+        ...hit._source
+    } as unknown as Organization));
 };
 
 let cachedOrganizations: BasicOrganizations;
@@ -226,10 +220,11 @@ export const findOrganizationsBasic = async (): Promise<BasicOrganizations> => {
             provinces: {}
         };
         const data = await findOrganizations(['Municipality', 'Province']);
+        data.sort((a, b) => a.name.localeCompare(b.name));
 
         data.map(organization => {
             const index = organization.classification === 'Province' ? 'provinces' : 'municipalities';
-            result[index][organization.meta.collection] = organization.name;
+            result[index][organization.collection] = organization.name;
         });
 
         cachedOrganizations = result;
@@ -238,16 +233,16 @@ export const findOrganizationsBasic = async (): Promise<BasicOrganizations> => {
     return cachedOrganizations;
 };
 
-const sendSearchRequest = async (params: SearchParameters, path: string = '', repeated: boolean = false): Promise<SearchResponse> => {
-    const response = await fetch(`${BASE_URL}${path}`, {
-        method: 'POST',
-        body: JSON.stringify(params)
-    });
+const sendSearchRequest = async (query: object, global: boolean = false): Promise<SearchResponse> => {
+    const path = global ? '_search' : `${await getEnabledIndices()}/_search`;
 
-    // the calls often fail without reason
-    if (response.status !== 200 && !repeated) {
-        return sendSearchRequest(params, path, true);
-    }
+    const response = await fetch(`${BASE_URL_SEARCH}/${path}`, {
+        method: 'POST',
+        body: JSON.stringify(query),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
 
     return await response.json();
 };

@@ -1,4 +1,4 @@
-import { DocumentResult } from '../scripts/lib/openstate';
+import { MediaObject } from '../scripts/lib/openstate';
 
 export interface SiteHandler {
     getUrls: GetUrlsFunction;
@@ -37,32 +37,7 @@ export type BodyElementCleaner = (nodes: NodeListOf<Element>) => Element[];
 
 export interface CacheItem {
     count: number | null;
-    results: DocumentResult[] | null;
+    results: MediaObject[] | null;
     time: number;
     keywords: Keywords;
-}
-
-export interface Source {
-    description: string;
-    note: string;
-    url: string;
-}
-
-export interface OpenStateEvent {
-    id: string;
-    name: string;
-    classification: string;
-    sources: Source[];
-    meta: {
-        highlight?: {
-            [key: string]: string[];
-        };
-        collection: string;
-    };
-    start_date?: string;
-}
-
-export interface HitCounts {
-    province: number;
-    municipality: number;
 }

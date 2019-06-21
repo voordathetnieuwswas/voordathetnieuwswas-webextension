@@ -82,7 +82,7 @@ export default class OpenStateCache {
         return this.storage.clear();
     }
 
-    create() {
+    create(): CacheItem {
         return { results: null, count: null, time: (new Date()).getTime(), keywords: [] };
     }
 
@@ -95,3 +95,20 @@ export default class OpenStateCache {
         return md5(key);
     }
 }
+
+let defaultCache: Promise<OpenStateCache>;
+
+const initDefaultCache = async () => {
+    const cache = new OpenStateCache();
+    await cache.init();
+
+    return cache;
+};
+
+export const getDefaultCache = async () => {
+    if (defaultCache === undefined) {
+        defaultCache = initDefaultCache();
+    }
+
+    return defaultCache;
+};

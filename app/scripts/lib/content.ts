@@ -1,6 +1,6 @@
 import { ArticleLink, CacheItem, Keywords, SiteHandler } from '../../entities/handlers';
 import { getArticleBody } from './net';
-import { findCount, findDocumentResults } from './openstate';
+import { findCount, findResults } from './openstate';
 import { getDom } from './dom';
 import OpenStateCache from './cache';
 
@@ -15,15 +15,13 @@ export const handleArticleLinks = (siteHandler: SiteHandler, cache: OpenStateCac
             const loc = document.createElement('a');
             loc.href = item.url;
 
-            if(siteHandler.shouldHandle(loc)){
+            if (siteHandler.shouldHandle(loc)) {
                 return getArticleBody(item.url).then((dom) => {
                     // extract keywords from the body body
                     if (dom) {
                         const keywords = getKeywordsFromSiteHandler(siteHandler, dom);
                         if (keywords && keywords.length) {
                             // search keywords on openstate api
-                            // TODO: remove daysAgo before release
-                            // findCount(keywords, 50)
                             findCount(keywords)
                                 .then((count: number) => {
                                     siteHandler.updateElement(count, item.element);
@@ -47,17 +45,12 @@ export const handleCurrentArticle = async (siteHandler: SiteHandler, cache: Open
     const dom = getDom(document.documentElement.innerHTML);
     const keywords = getKeywordsFromSiteHandler(siteHandler, dom);
 
-    // TODO remove
-    // console.log('keywords: ', keywords)
-
-    if(keywords && keywords.length){
+    if (keywords && keywords.length) {
         let cacheItem = cache.get(location.href) || cache.create();
 
         if (cacheItem.results === null) {
             // Search by keywords on Open State API
-            // TODO: remove daysAgo before release
-            // const data = await findDocumentResults(keywords, 50);
-            const data = await findDocumentResults(keywords);
+            const data = await findResults(keywords);
             if (data) {
                 cacheItem = { ...cacheItem, results: data, keywords };
                 cache.set(location.href, cacheItem);
