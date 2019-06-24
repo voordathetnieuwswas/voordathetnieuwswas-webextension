@@ -599,7 +599,7 @@ const resultsContent = (
 
         const match = result.index.match(/(ori|osi)_([a-z-]+)_\d+/);
 
-        if (match && match[1] && match[2]) {
+        if (match) {
             if (match[1] === 'ori') {
                 orgClass = 'municipality';
                 orgName = organizations.municipalities[match[2]];
@@ -629,7 +629,7 @@ const resultsContent = (
         linkElem.appendChild(titleElem);
 
         if (result.highlight.text) {
-            result.highlight.text.map(highlight => {
+            result.highlight.text.forEach(highlight => {
                 const elem = document.createElement('p');
                 elem.className = 'highlight';
                 elem.innerHTML = `...${highlight.trim()}...`;

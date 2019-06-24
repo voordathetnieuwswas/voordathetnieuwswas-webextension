@@ -6,6 +6,8 @@ const BASE_URL_SEARCH = 'https://api.openraadsinformatie.nl/v1/elastic';
 const MAX_RESULT_SIZE = 10000;
 const DATE_INTERVAL_DAYS = 14;
 
+let relatedItems: Promise<string[]>;
+
 export interface Document {
     _id: string;
     _index: string;
@@ -77,8 +79,6 @@ const mediaObjectsQuery = async (keywords: string[]) => ({
         ]
     }
 });
-
-let relatedItems: Promise<string[]>;
 
 const getRelatedItems = () => {
     if (relatedItems === undefined) {
