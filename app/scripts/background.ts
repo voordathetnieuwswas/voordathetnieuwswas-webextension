@@ -1,5 +1,10 @@
 const activePorts: { [id: number]: browser.runtime.Port } = {};
 
+browser.runtime.onInstalled.addListener(details => {
+    // Clear the cache whenever the extension is updated
+    browser.storage.local.clear();
+});
+
 // Handle incoming connections from our content script
 browser.runtime.onConnect.addListener(port => {
     const tabId = port.sender && port.sender.tab && port.sender.tab.id;

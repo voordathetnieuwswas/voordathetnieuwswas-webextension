@@ -30,8 +30,8 @@ import { weedCutterWords } from '../../words/wordlist';
 export const getUrlsBySelector = (selector: string, validator: UrlElementValidator = defaultUrlElementValidator): GetUrlsFunction => {
     return () => {
         const urls: ArticleLink[] = [];
-        document.querySelectorAll(selector).forEach((item: Element) => {
-            const href = item.getAttribute('href');
+        document.querySelectorAll(selector).forEach((item: HTMLAnchorElement) => {
+            const href = item.href;
 
             // only unique urls are collected
             if (href && !urls.find((link: ArticleLink) => link.url === href)) {
@@ -133,12 +133,9 @@ export const getKeywordsFromBodyAndTitle = (
         const articleBodyNodes = bodyElementCleaner(dom.querySelectorAll(selectors.body));
 
         if (articleTitle && articleBodyNodes) {
-            // const keywordsFromTitle = articleTitle.textContent;
-
             // double word value for title
             const text: string = (articleTitle.textContent + ' ' || '').repeat(2) + extractTextFromNodes(articleBodyNodes);
             const tokens: TokenWords = textToTokens(text);
-            // console.log(tokens);
 
             // we will only match keywords if any of the weed cutter words have been found. This will limit the number of matches greatly
             if (matchesKeywords(tokens, weedCutterWords)) {
@@ -164,16 +161,12 @@ export const getKeywordsFromBodyAndTitle = (
                 } else {
                     return [];
                 }
-            } else {
-                // TODO : remove
-                console.log('Article does not match weed cutter words');
             }
         }
 
         return [];
     };
 };
-
 
 /**
  * Find the city by css selector

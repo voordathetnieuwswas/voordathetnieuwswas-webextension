@@ -16,10 +16,10 @@ export const handler: SiteHandler = {
     getUrls: getUrlsBySelector(linkSelector),
     getKeywords: getKeywordsByMetaAndBody(
         ['keywords', 'news_keywords'],
-        { body: 'main > body', title: '.article__title', city: '' }
+        { body: '[class^=contentBody]', title: 'h1', city: '' }
     ),
     updateElement: updateElementByTitlePrefix('[class*="__title"]'),
-    isArticlePage: containsSelector('.article_body'),
+    isArticlePage: containsSelector('.page-article'),
     isSPA: defaultSPAChecker,
     mutatablesSelector: '',
 };

@@ -51,8 +51,6 @@ export const getKeywordsByWordList = (wordList: WordList, dynamicWordList: Dynam
         return acc;
     }, {});
 
-    // console.log('foundKeywords', foundKeywords);
-
     // determine priority of found keywords by word count. If they are equal, look at the length of the word, bigger is better
     const keyWordIndex = Object.keys(foundKeywords).sort((a: string, b: string) => {
         const pointsA = getWordScore(a, foundKeywords[a]);

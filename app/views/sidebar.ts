@@ -1,6 +1,6 @@
 import { CacheItem } from '../entities/handlers';
 import { getOptions, Options, OptionsParam, saveOptions } from '../scripts/lib/options';
-import { BasicOrganizations, DocumentResult, findOrganizationsBasic } from '../scripts/lib/openstate';
+import { BasicOrganizations, findOrganizationsBasic, MediaObject } from '../scripts/lib/openstate';
 import { init } from '../scripts/contentscript';
 
 export const buildSidebar = (
@@ -565,7 +565,7 @@ const settingsContent = (options: Options, organizations: BasicOrganizations) =>
 };
 
 const resultsContent = (
-    results: DocumentResult[],
+    results: MediaObject[],
     keywords: string[],
     organizations: BasicOrganizations
 ): HTMLElement => {
@@ -597,12 +597,16 @@ const resultsContent = (
         let orgClass = '';
         let orgName = '';
 
-        if (organizations.provinces[result.event.collection]) {
-            orgClass = 'province';
-            orgName = organizations.provinces[result.event.collection];
-        } else if (organizations.municipalities[result.event.collection]) {
-            orgClass = 'municipality';
-            orgName = 'Gemeente ' + organizations.municipalities[result.event.collection];
+        const match = result.index.match(/(ori|osi)_([a-z-]+)_\d+/);
+
+        if (match) {
+            if (match[1] === 'ori') {
+                orgClass = 'municipality';
+                orgName = organizations.municipalities[match[2]];
+            } else {
+                orgClass = 'province';
+                orgName = organizations.provinces[match[2]];
+            }
         }
 
         const itemElem = document.createElement('li');
@@ -610,7 +614,7 @@ const resultsContent = (
 
         const linkElem = document.createElement('a') as HTMLAnchorElement;
         linkElem.className = 'sidebar-item';
-        linkElem.href = result.source.url;
+        linkElem.href = result.url;
         linkElem.target = '_blank';
         itemElem.appendChild(linkElem);
 
@@ -621,33 +625,17 @@ const resultsContent = (
 
         const titleElem = document.createElement('h2');
         titleElem.className = 'document-title';
-        titleElem.innerText = result.source.note;
+        titleElem.innerText = result.name;
         linkElem.appendChild(titleElem);
 
-        const metaElem = document.createElement('div');
-        metaElem.className = 'meta';
-        const resultTypeElem = document.createElement('span');
-        resultTypeElem.innerText = result.event.classification;
-        resultTypeElem.title = result.event.name;
-        metaElem.appendChild(resultTypeElem);
-        if (result.event.startDate) {
-            const date = new Date(result.event.startDate || 0).toLocaleDateString('nl-NL', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
+        if (result.highlight.text) {
+            result.highlight.text.forEach(highlight => {
+                const elem = document.createElement('p');
+                elem.className = 'highlight';
+                elem.innerHTML = `...${highlight.trim()}...`;
+                linkElem.appendChild(elem);
             });
-            const dateElem = document.createElement('span');
-            dateElem.innerText = ` - ${date}`;
-            metaElem.appendChild(dateElem);
         }
-        linkElem.appendChild(metaElem);
-
-        result.highlights.map(highlight => {
-            const elem = document.createElement('p');
-            elem.className = 'highlight';
-            elem.innerHTML = `...${highlight.trim()}...`;
-            linkElem.appendChild(elem);
-        });
 
         listElem.appendChild(itemElem);
     });
