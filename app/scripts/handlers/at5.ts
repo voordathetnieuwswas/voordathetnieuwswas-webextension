@@ -17,10 +17,10 @@ const linkSelector = `a.post--news, a.spklw-post-link, a.post`;
 export const handler: SiteHandler = {
     shouldHandle: (location) => !location.pathname.startsWith('/ajax') && !location.pathname.startsWith('/112'),
     getUrls: getUrlsBySelector(linkSelector, (link: ArticleLink) => {
-        return !link.url.match('/ajax') && !link.url.match('/112')
+        return !link.url.match('/ajax') && !link.url.match('/112');
     }),
     getKeywords: getKeywordsFromBodyAndTitle(
-        {body: '.detail__content', title: 'h1.heading__title', city: ''},
+        { body: '.detail__content', title: 'h1', city: '' },
         getKeywordsByWordList(provinceWords.concat(words), dynamicWords, 3),
         (selector, dom) => {
             return 'Amsterdam';
@@ -44,5 +44,5 @@ export const handler: SiteHandler = {
     ),
     isArticlePage: containsSelector('.detail-page'),
     isSPA: () => true,
-    mutatablesSelector: '.news-list, main .detail-page .container',
+    mutatablesSelector: '.news-list, main .detail-page .container'
 };

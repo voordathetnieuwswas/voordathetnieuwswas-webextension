@@ -30,8 +30,8 @@ import { weedCutterWords } from '../../words/wordlist';
 export const getUrlsBySelector = (selector: string, validator: UrlElementValidator = defaultUrlElementValidator): GetUrlsFunction => {
     return () => {
         const urls: ArticleLink[] = [];
-        document.querySelectorAll(selector).forEach((item: Element) => {
-            const href = item.getAttribute('href');
+        document.querySelectorAll(selector).forEach((item: HTMLAnchorElement) => {
+            const href = item.href;
 
             // only unique urls are collected
             if (href && !urls.find((link: ArticleLink) => link.url === href)) {
